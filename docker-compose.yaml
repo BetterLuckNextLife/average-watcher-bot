@@ -1,0 +1,37 @@
+services:
+  average-watcher-bot:
+    build: .
+    container_name: average-watcher-bot
+    depends_on:
+      - ping-target-1
+      - ping-target-2
+      - ping-target-3
+    networks:
+      pingnet:
+        ipv4_address: 192.168.101.10
+    env_file:
+      - .env
+  ping-target-1:
+    build: ./ping-target/
+    container_name: ping-target-1
+    networks:
+      pingnet:
+        ipv4_address: 192.168.101.11
+  ping-target-2:
+    build: ./ping-target/
+    container_name: ping-target-2
+    networks:
+      pingnet:
+        ipv4_address: 192.168.101.12
+  ping-target-3:
+    build: ./ping-target/
+    container_name: ping-target-3
+    networks:
+      pingnet:
+        ipv4_address: 192.168.101.13
+networks:
+  pingnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "192.168.101.0/24"
