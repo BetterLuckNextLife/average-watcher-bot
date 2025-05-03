@@ -92,7 +92,7 @@ func updateStatusMapAndAlert(statusMap map[string]bool, watchers []int64) map[st
 		newStatus := checkICMP(ip)
 		if status != newStatus {
 			for _, watcherID := range watchers {
-				sendAlert(watcherID, ip, status)
+				sendAlert(watcherID, ip, newStatus)
 			}
 			statusMap[ip] = newStatus
 		}
@@ -115,7 +115,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var watchlist = []string{"192.168.1.1", "192.168.100.1", "192.168.100.2", "192.168.100.3"}
+	var watchlist = []string{"192.168.101.11", "192.168.101.12", "192.168.101.13"}
 
 	// Загрузить/создать словарь статусов
 	statusMap := loadStatusMap()
