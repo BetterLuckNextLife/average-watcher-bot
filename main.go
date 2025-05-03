@@ -13,16 +13,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func loadDotenv() (string, int64) {
+func loadDotenv() (string, []int64) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Файл окружения не найден")
 	}
 
 	token := os.Getenv("TG_TOKEN")
-	chatID, _ := strconv.ParseInt(os.Getenv("TG_CHAT_ID"), 10, 64)
 
-	return token, chatID
+	// TODO: Добавить поддержку множества ID
+	chatID, _ := strconv.ParseInt(os.Getenv("TG_CHAT_ID"), 10, 64)
+	var watchers []int64
+	watchers = append(watchers, chatID)
+
+	return token, watchers
 }
 
 func loadStatusMap() map[string]bool {
@@ -44,7 +48,7 @@ func checkICMP(ip string) bool {
 		log.Println("Ошибка создания пингера:", err)
 		return false
 	}
-	pinger.Count = 1
+	pinger.Count = 5
 	pinger.Timeout = time.Second * 2
 
 	err = pinger.Run()
@@ -77,12 +81,36 @@ func generateStatusMap(watchlist []string) map[string]bool {
 	return statusMap
 }
 
+func sendAlert(chatID int64, ip string, status bool) {
+	msg := tgbotapi.NewMessage(chatID, "Сервер по адресу "+ip+" сменил статус на "+strconv.FormatBool(status))
+	bot.Send(msg)
+}
+
+func updateStatusMapAndAlert(statusMap map[string]bool, watchers []int64) map[string]bool {
+	// Проверяем все адреса из watchlist
+	for ip, status := range statusMap {
+		newStatus := checkICMP(ip)
+		if status != newStatus {
+			for _, watcherID := range watchers {
+				sendAlert(watcherID, ip, status)
+			}
+			statusMap[ip] = newStatus
+		}
+	}
+
+	saveStatusMap(statusMap)
+	return statusMap
+}
+
+var bot *tgbotapi.BotAPI
+
 func main() {
 	// Загружаем .env
-	token, chatID := loadDotenv()
+	token, watchers := loadDotenv()
 
 	// Стартуем бота
-	bot, err := tgbotapi.NewBotAPI(token)
+	var err error
+	bot, err = tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -95,8 +123,22 @@ func main() {
 		statusMap = generateStatusMap(watchlist)
 	}
 
+	// Сигнализируем о включении
+	for _, watcherID := range watchers {
+		msg := tgbotapi.NewMessage(watcherID,
+			"Бот запущен!\n"+
+				"Отслежываемые ip: "+strconv.Itoa(len(watchlist))+"\n"+
+				"Отслеживающих: "+strconv.Itoa(len(watchers))+"\n")
+		bot.Send(msg)
+	}
+
 	// Отправляем данные
-	document := tgbotapi.NewDocument(chatID, tgbotapi.FilePath("statusMap.json"))
-	bot.Send(document)
-	bot.Debug = true
+	ticker := time.NewTicker(1 * time.Second)
+	for {
+		select {
+		case <-ticker.C:
+			updateStatusMapAndAlert(statusMap, watchers)
+		}
+	}
+
 }
