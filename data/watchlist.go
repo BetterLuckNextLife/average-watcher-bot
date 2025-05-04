@@ -27,28 +27,25 @@ func AddToWatchList(newIp string) (bool, error) {
 	if net.ParseIP(newIp) == nil {
 		return false, nil
 	}
-	var check bool = true
 	for _, ip := range watchlist {
 		if ip == newIp {
-			check = check && false
+			return false, nil
 		}
 	}
 
-	if check {
-		watchlist = append(watchlist, newIp)
+	watchlist = append(watchlist, newIp)
 
-		jsonData, err := json.Marshal(watchlist)
-		if err != nil {
-			log.Println("Ошибка обработки списка наблюдаемых!")
-			return false, err
-		}
-
-		err = os.WriteFile("storage/watchlist.json", jsonData, 0644)
-		if err != nil {
-			log.Println("Ошибка записи списка наблюдаемых!" + err.Error())
-			return false, err
-		}
-
+	jsonData, err := json.Marshal(watchlist)
+	if err != nil {
+		log.Println("Ошибка обработки списка наблюдаемых!")
+		return false, err
 	}
+
+	err = os.WriteFile("storage/watchlist.json", jsonData, 0644)
+	if err != nil {
+		log.Println("Ошибка записи списка наблюдаемых!" + err.Error())
+		return false, err
+	}
+
 	return true, nil
 }
