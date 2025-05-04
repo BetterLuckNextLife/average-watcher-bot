@@ -15,5 +15,6 @@ WORKDIR /app
 
 COPY --from=builder /app/AverageWatcherBot .
 COPY .env .
+COPY ./storage ./storage
 
 CMD [ "./AverageWatcherBot" ]

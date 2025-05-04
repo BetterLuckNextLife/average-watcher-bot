@@ -1,7 +1,6 @@
 package data
 
 import (
-	"average-watcher-bot/chat"
 	"average-watcher-bot/checker"
 	"encoding/json"
 	"log"
@@ -31,31 +30,15 @@ func GenerateStatusMap(watchlist []string) map[string]bool {
 		statusMap[ip] = checker.CheckICMP(ip)
 	}
 
-	saveStatusMap(statusMap)
+	SaveStatusMap(statusMap)
 	return statusMap
 }
 
 // Сохраняет данные в фалй storage/statusMap.json
-func saveStatusMap(statusMap map[string]bool) {
+func SaveStatusMap(statusMap map[string]bool) {
 	jsonStatusMap, err := json.Marshal(statusMap)
 	if err != nil {
 		log.Fatal(err)
 	}
 	os.WriteFile("storage/statusMap.json", jsonStatusMap, 0666)
-}
-
-// Проверяет статус хостов, при изменении обновляет его, уведомляет наблюдателей
-func UpdateStatusMapAndAlert(statusMap map[string]bool, watchers []int64) map[string]bool {
-	for ip, status := range statusMap {
-		newStatus := checker.CheckICMP(ip)
-		if status != newStatus {
-			for _, watcherID := range watchers {
-				chat.SendAlert(watcherID, ip, newStatus)
-				statusMap[ip] = newStatus
-			}
-		}
-	}
-
-	saveStatusMap(statusMap)
-	return statusMap
 }

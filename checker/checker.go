@@ -1,4 +1,3 @@
-// checker/ping.go
 package checker
 
 import (

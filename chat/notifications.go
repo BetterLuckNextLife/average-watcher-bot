@@ -1,10 +1,12 @@
 package chat
 
 import (
+	"average-watcher-bot/checker"
+	"average-watcher-bot/data"
 	"log"
 	"strconv"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 var bot *tgbotapi.BotAPI
@@ -34,4 +36,20 @@ func StartupNotify(watchers []int64, watchlist []string) {
 				"Отслеживающих: "+strconv.Itoa(len(watchers))+"\n")
 		bot.Send(msg)
 	}
+}
+
+// Проверяет статус хостов, при изменении обновляет его, уведомляет наблюдателей
+func UpdateStatusMapAndAlert(statusMap map[string]bool, watchers []int64) map[string]bool {
+	for ip, status := range statusMap {
+		newStatus := checker.CheckICMP(ip)
+		if status != newStatus {
+			for _, watcherID := range watchers {
+				SendAlert(watcherID, ip, newStatus)
+				statusMap[ip] = newStatus
+			}
+		}
+	}
+
+	data.SaveStatusMap(statusMap)
+	return statusMap
 }

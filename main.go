@@ -8,12 +8,12 @@ import (
 )
 
 func main() {
-	// Загружаем .env
-	token, watchers := config.LoadDotenv()
+	// Загружаем данные
 	interval := 1
 
-	// Загружаем список наблюдаемых
-	var watchlist = []string{"192.168.101.11", "192.168.101.12", "192.168.101.13"}
+	token := config.LoadToken()
+	watchlist := data.LoadWatchList()
+	watchers := data.LoadWatchers()
 
 	// Загрузить/создать словарь статусов
 	statusMap := data.LoadStatusMap()
@@ -26,13 +26,13 @@ func main() {
 
 	// Сигнализируем о включении
 	chat.StartupNotify(watchers, watchlist)
-
+	go chat.ListenUpdates()
 	// Проверяем статус хостов и уведомляем при изменениях
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	for {
 		select {
 		case <-ticker.C:
-			data.UpdateStatusMapAndAlert(statusMap, watchers)
+			chat.UpdateStatusMapAndAlert(statusMap, watchers)
 		}
 	}
 
