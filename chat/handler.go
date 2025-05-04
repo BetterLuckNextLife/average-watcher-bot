@@ -24,20 +24,20 @@ func ListenUpdates() {
 			ip := strings.TrimSpace(strings.TrimPrefix(text, "/add "))
 			ok, err := data.AddToWatchList(ip)
 			if ok == false && err == nil {
-				send(update.Message.Chat.ID, "Некорректный IP!")
+				send(update.Message.Chat.ID, "⚠️ Некорректный IP!")
 			}
 			if err != nil {
-				send(update.Message.Chat.ID, "Ошибка при добавлении")
+				send(update.Message.Chat.ID, "⚠️ Ошибка при добавлении")
 			} else if ok == false {
-				send(update.Message.Chat.ID, "IP уже отслеживается")
+				send(update.Message.Chat.ID, "⚠️ IP уже отслеживается")
 			} else {
-				send(update.Message.Chat.ID, "IP успешно добавлен: "+ip)
+				send(update.Message.Chat.ID, "✔️ IP успешно добавлен: "+ip)
 			}
 		}
 
 		if text == "/list" {
 			list := data.LoadWatchList()
-			msg := "Отслеживаемые IP:\n"
+			msg := "🎯 Отслеживаемые IP:\n"
 			for _, ip := range list {
 				msg += "• " + ip + "\n"
 			}

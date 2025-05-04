@@ -23,7 +23,13 @@ func StartUp(token string) {
 
 // Уведомление о изменении статуса хоста
 func SendAlert(chatID int64, ip string, status bool) {
-	msg := tgbotapi.NewMessage(chatID, "Сервер по адресу "+ip+" сменил статус на "+strconv.FormatBool(status))
+	var msg tgbotapi.MessageConfig
+	if status == true {
+		msg = tgbotapi.NewMessage(chatID, "✅ Сервер по адресу "+ip+" теперь онлайн!")
+	} else {
+		msg = tgbotapi.NewMessage(chatID, "❌ Сервер по адресу "+ip+" не отвечает!")
+	}
+
 	bot.Send(msg)
 }
 
@@ -31,9 +37,9 @@ func SendAlert(chatID int64, ip string, status bool) {
 func StartupNotify(watchers []int64, watchlist []string) {
 	for _, watcherID := range watchers {
 		msg := tgbotapi.NewMessage(watcherID,
-			"Бот запущен!\n"+
-				"Отслежываемые ip: "+strconv.Itoa(len(watchlist))+"\n"+
-				"Отслеживающих: "+strconv.Itoa(len(watchers))+"\n")
+			"*🟢 Бот запущен!*\n"+
+				"🎯 Отслежываемые ip: "+strconv.Itoa(len(watchlist))+"\n"+
+				"🕶 Отслеживающих: "+strconv.Itoa(len(watchers))+"\n")
 		bot.Send(msg)
 	}
 }
@@ -44,8 +50,8 @@ func UpdateStatusMapAndAlert(statusMap map[string]bool, watchers []int64) map[st
 		newStatus := checker.CheckICMP(ip)
 		if status != newStatus {
 			for _, watcherID := range watchers {
-				SendAlert(watcherID, ip, newStatus)
 				statusMap[ip] = newStatus
+				SendAlert(watcherID, ip, newStatus)
 			}
 		}
 	}
