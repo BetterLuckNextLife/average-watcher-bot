@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// Загружаем данные
-	interval := 1
+	interval := 10
 
 	token := config.LoadToken()
 	watchlist := data.LoadWatchList()
@@ -32,7 +32,12 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			chat.UpdateStatusMapAndAlert(statusMap, watchers)
+			watchlist = data.LoadWatchList()
+			if len(watchlist) != len(statusMap) {
+				statusMap = data.GenerateStatusMap(watchlist)
+			} else {
+				chat.UpdateStatusMapAndAlert(statusMap, watchers)
+			}
 		}
 	}
 

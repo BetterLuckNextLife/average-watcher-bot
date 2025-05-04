@@ -12,23 +12,29 @@ services:
     env_file:
       - .env
   ping-target-1:
-    build: ./ping-target/
+    build: ./ping-targets/ping-target-short/
     container_name: ping-target-1
     networks:
       pingnet:
         ipv4_address: 192.168.101.11
   ping-target-2:
-    build: ./ping-target/
+    build: ./ping-targets/ping-target-medium/
     container_name: ping-target-2
     networks:
       pingnet:
         ipv4_address: 192.168.101.12
   ping-target-3:
-    build: ./ping-target/
+    build: ./ping-targets/ping-target-long/
     container_name: ping-target-3
     networks:
       pingnet:
         ipv4_address: 192.168.101.13
+  ping-target-4:
+    build: ./ping-targets/ping-target-long/
+    container_name: ping-target-4
+    networks:
+      pingnet:
+        ipv4_address: 192.168.101.14
 networks:
   pingnet:
     driver: bridge
