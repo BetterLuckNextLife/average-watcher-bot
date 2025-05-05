@@ -20,6 +20,38 @@ func LoadWatchList() []string {
 	return watchlist
 }
 
+func RemoveFromWatchList(targetIP string) (bool, error) {
+	watchlist := LoadWatchList()
+	updated := []string{}
+	found := false
+
+	for _, ip := range watchlist {
+		if ip == targetIP {
+			found = true
+			continue
+		}
+		updated = append(updated, ip)
+	}
+
+	if !found {
+		return false, nil
+	}
+
+	jsonData, err := json.Marshal(updated)
+	if err != nil {
+		log.Println("Ошибка сериализации при удалении IP:", err)
+		return false, err
+	}
+
+	err = os.WriteFile("storage/watchlist.json", jsonData, 0644)
+	if err != nil {
+		log.Println("Ошибка записи файла при удалении IP:", err)
+		return false, err
+	}
+
+	return true, nil
+}
+
 func AddToWatchList(newIp string) (bool, error) {
 	watchlist := LoadWatchList()
 

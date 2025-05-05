@@ -43,6 +43,18 @@ func ListenUpdates() {
 			}
 			send(update.Message.Chat.ID, msg)
 		}
+
+		if strings.HasPrefix(text, "/remove ") {
+			ip := strings.TrimSpace(strings.TrimPrefix(text, "/remove "))
+			ok, err := data.RemoveFromWatchList(ip)
+			if err != nil {
+				send(update.Message.Chat.ID, "⚠️ Ошибка при удалении")
+			} else if !ok {
+				send(update.Message.Chat.ID, "⚠️ Такого IP нет в списке")
+			} else {
+				send(update.Message.Chat.ID, "🗑️ IP удалён: " + ip)
+			}
+		}
 	}
 }
 

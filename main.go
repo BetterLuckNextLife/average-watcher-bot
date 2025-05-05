@@ -27,6 +27,7 @@ func main() {
 	// Сигнализируем о включении
 	chat.StartupNotify(watchers, watchlist)
 	go chat.ListenUpdates()
+	
 	// Проверяем статус хостов и уведомляем при изменениях
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	for {
