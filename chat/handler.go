@@ -52,9 +52,25 @@ func ListenUpdates() {
 			} else if !ok {
 				send(update.Message.Chat.ID, "⚠️ Такого IP нет в списке")
 			} else {
-				send(update.Message.Chat.ID, "🗑️ IP удалён: " + ip)
+				send(update.Message.Chat.ID, "🗑️ IP удалён: "+ip)
 			}
 		}
+
+		if strings.HasPrefix(text, "/status") {
+			statusMap := data.LoadStatusMap()
+			msg := "🖥 Статус серверов сейчас: \n"
+			for ip, status := range statusMap {
+				var statusText string
+				if status {
+					statusText = "🟢 Онлайн"
+				} else {
+					statusText = "🔴 Оффлайн"
+				}
+				msg += "• " + ip + ": " + statusText + "\n"
+			}
+			send(update.Message.Chat.ID, msg)
+		}
+
 	}
 }
 

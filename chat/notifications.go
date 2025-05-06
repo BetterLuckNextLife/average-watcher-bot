@@ -37,7 +37,7 @@ func SendAlert(chatID int64, ip string, status bool) {
 func StartupNotify(watchers []int64, watchlist []string) {
 	for _, watcherID := range watchers {
 		msg := tgbotapi.NewMessage(watcherID,
-			"*🟢 Бот запущен!*\n"+
+			"🟢 Бот запущен!\n"+
 				"🎯 Отслежываемые ip: "+strconv.Itoa(len(watchlist))+"\n"+
 				"🕶 Отслеживающих: "+strconv.Itoa(len(watchers))+"\n")
 		bot.Send(msg)
