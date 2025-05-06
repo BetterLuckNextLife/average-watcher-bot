@@ -17,7 +17,8 @@
 - ```git clone https://github.com/BetterLuckNextLife/average-watcher-bot/```
 2) Сконфигурируйте под себя
 - Измените /storage/watchers.json и /storage/watchlist.json
-- Вставьте токен бота в /.env
+-  (в watchers.json впишите ID чатов, кому бот будем отправлять уведомления)
+- Вставьте токен бота в [.env](/.env)
 3) Соберите образ
 - ```docker build -t average-watcher-bot .```
 4) Запустите
@@ -28,7 +29,8 @@
 - ```git clone https://github.com/BetterLuckNextLife/average-watcher-bot/```
 2) Сконфигурируйте под себя
 - Измените /storage/watchers.json и /storage/watchlist.json
-- Вставьте токен бота в /.env2
+-  (в watchers.json впишите ID чатов, кому бот будем отправлять уведомления)
+- Вставьте токен бота в [.env](/.env)
 3) Скомпилируйте
 - ```go mod download```
 - ```go build main.go``` 
